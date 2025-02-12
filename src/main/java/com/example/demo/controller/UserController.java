@@ -16,7 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "https://venuetrack.netlify.app") // ✅ Allow frontend access
+@CrossOrigin(origins = "https://venuetrack.netlify.app", allowCredentials = "true")
 public class UserController {
 
     @Autowired
