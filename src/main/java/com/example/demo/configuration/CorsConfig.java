@@ -13,8 +13,8 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")  // ✅ Allow all API requests (for debugging)
-                        .allowedOrigins("*")  // ✅ TEMPORARY: Allow all origins (Change to frontend URL later)
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("https://venuetrack.netlify.app")  // ✅ Corrected
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
