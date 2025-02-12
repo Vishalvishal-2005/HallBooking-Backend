@@ -29,17 +29,18 @@ public class UserController {
 
 @PostMapping("/signin")
 public ResponseEntity<?> signIn(@RequestBody User user) {
-    System.out.println("🔍 Received login request for email: " + user.getEmail());
+    System.out.println("🔍 Received login request: " + user);
+
+    if (user.getEmail() == null || user.getPassword() == null) {
+        System.out.println("❌ Email or Password is null!");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email and password are required");
+    }
 
     User response = userService.findByEmail(user.getEmail());
     if (response == null) {
         System.out.println("❌ User not found for email: " + user.getEmail());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
-
-    System.out.println("✅ Found user: " + response.getEmail());
-    System.out.println("🔐 Stored password: " + response.getPassword());
-    System.out.println("🔑 Entered password: " + user.getPassword());
 
     if (!passwordEncoder.matches(user.getPassword(), response.getPassword())) {
         System.out.println("❌ Password mismatch for email: " + user.getEmail());
@@ -48,13 +49,14 @@ public ResponseEntity<?> signIn(@RequestBody User user) {
 
     String token = jwtUtil.generateToken(response.getEmail());
     System.out.println("✅ Login successful! Token generated: " + token);
-
+    
     Map<String, Object> responseBody = new HashMap<>();
     responseBody.put("token", token);
     responseBody.put("user", response);
-
+    
     return ResponseEntity.ok(responseBody);
 }
+
 
 
     @GetMapping
