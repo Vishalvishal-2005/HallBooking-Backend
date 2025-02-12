@@ -13,11 +13,11 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**") // Allow all API endpoints
-                        .allowedOrigins("https://venuetrack.netlify.app") // Allow only your frontend
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed HTTP methods
+                registry.addMapping("/**") // Allow all endpoints
+                        .allowedOrigins("https://venuetrack.netlify.app") // Allow frontend
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allow all HTTP methods
                         .allowedHeaders("*") // Allow all headers
-                        .allowCredentials(true); // Allow cookies/authentication
+                        .allowCredentials(true); // Allow cookies/auth
             }
         };
     }
