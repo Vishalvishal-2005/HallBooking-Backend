@@ -1,7 +1,6 @@
 package com.example.demo.util;
 
 import java.util.Date;
-
 import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Component;
@@ -15,7 +14,7 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "DWnN2JPlmIimWXd3ZJWJtQ9mQOggGynoZpLCtvrGr/M=";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; 
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
 
     private static final SecretKey KEY = Keys.hmacShaKeyFor(java.util.Base64.getDecoder().decode(SECRET_KEY));
 
