@@ -7,18 +7,16 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import com.example.demo.util.JwtUtil;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "https://venuetrack.netlify.app") // ✅ Allow frontend access
 public class UserController {
 
     @Autowired
@@ -27,17 +25,19 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @PostMapping("/signin")
     public ResponseEntity<?> signIn(@RequestBody User user) {
-        User response = userService.validateUser(user.getEmail(), user.getPassword());
-        
-        if (response != null) {
+        User response = userService.findByEmail(user.getEmail());
+
+        if (response != null && passwordEncoder.matches(user.getPassword(), response.getPassword())) {
             String token = jwtUtil.generateToken(response.getEmail());
 
             // Return JSON response
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("token", token);
-            responseBody.put("user", response); // Include user details
+            responseBody.put("user", response);
 
             return ResponseEntity.ok(responseBody);
         } else {
@@ -56,7 +56,11 @@ public class UserController {
         if (userService.findByEmail(user.getEmail()) != null) {
             return new ResponseEntity<>("Email already exists", HttpStatus.CONFLICT);
         }
+        
+        // ✅ Hash password before saving user
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.saveUser(user);
+
         return new ResponseEntity<>("Signup successful", HttpStatus.CREATED);
     }
 }
