@@ -26,36 +26,24 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
 @PostMapping("/signin")
-public ResponseEntity<?> signIn(@RequestBody User user) {
-    System.out.println("🔍 Received login request: " + user);
+    public ResponseEntity<?> signIn(@RequestBody User user) {
+        User response = userService.findByEmail(user.getEmail());
 
-    if (user.getEmail() == null || user.getPassword() == null) {
-        System.out.println("❌ Email or Password is null!");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email and password are required");
+        if (response != null && passwordEncoder.matches(user.getPassword(), response.getPassword())) {
+            String token = jwtUtil.generateToken(response.getEmail());
+
+            // Return JSON response
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("token", token);
+            responseBody.put("user", response);
+
+            return ResponseEntity.ok(responseBody);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
     }
 
-    User response = userService.findByEmail(user.getEmail());
-    if (response == null) {
-        System.out.println("❌ User not found for email: " + user.getEmail());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-    }
-
-    if (!passwordEncoder.matches(user.getPassword(), response.getPassword())) {
-        System.out.println("❌ Password mismatch for email: " + user.getEmail());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-    }
-
-    String token = jwtUtil.generateToken(response.getEmail());
-    System.out.println("✅ Login successful! Token generated: " + token);
-    
-    Map<String, Object> responseBody = new HashMap<>();
-    responseBody.put("token", token);
-    responseBody.put("user", response);
-    
-    return ResponseEntity.ok(responseBody);
-}
 
 
 
