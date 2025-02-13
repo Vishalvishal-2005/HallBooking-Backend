@@ -27,6 +27,22 @@ public class UserController {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 @PostMapping("/signin")
+    /**
+     * Signs in a user by validating their credentials and generating a JWT token.
+     *
+     * This method takes a {@link User} object from the request body, retrieves the user by email,
+     * and checks if the provided password matches the stored password. If the credentials are valid,
+     * it generates a JWT token and returns it along with the user information in the response.
+     *
+     * @param user the {@link User} object containing the email and password for authentication
+     * @return a {@link ResponseEntity} containing either the generated token and user information
+     *         if authentication is successful, or an unauthorized status with an error message
+     *         if the credentials are invalid.
+     *
+     * @throws IllegalArgumentException if the provided user object is null or contains invalid data.
+     * @throws UserNotFoundException if no user is found with the provided email.
+     * @throws AuthenticationException if there is an error during the authentication process.
+     */
     public ResponseEntity<?> signIn(@RequestBody User user) {
         User response = userService.findByEmail(user.getEmail());
 
