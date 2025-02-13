@@ -27,22 +27,18 @@ public class UserController {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@RequestBody User user) {
-        User response = userService.findByEmail(user.getEmail());
+public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    User user = userRepository.findByEmail(loginRequest.getEmail())
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (response != null && passwordEncoder.matches(user.getPassword(), response.getPassword())) {
-            String token = jwtUtil.generateToken(response.getEmail());
-
-            // Return JSON response
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("token", token);
-            responseBody.put("user", response);
-
-            return ResponseEntity.ok(responseBody);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        }
+    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        throw new RuntimeException("Invalid password");
     }
+
+    String token = jwtTokenProvider.createToken(user.getEmail());
+    return ResponseEntity.ok(new AuthResponse(user, token));
+}
+
 
 
 
