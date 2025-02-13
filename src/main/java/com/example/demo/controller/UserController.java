@@ -27,6 +27,18 @@ public class UserController {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 @PostMapping("/signin")
+/**
+ * Authenticates a user based on the provided login request.
+ *
+ * This method retrieves a user by their email from the user repository.
+ * If the user is found, it checks if the provided password matches the stored password.
+ * If the authentication is successful, it generates a JWT token for the user and returns
+ * an AuthResponse containing the user information and the token.
+ *
+ * @param loginRequest the login request containing the user's email and password
+ * @return a ResponseEntity containing an AuthResponse with user information and JWT token
+ * @throws RuntimeException if the user is not found or if the password is invalid
+ */
 public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
     User user = userRepository.findByEmail(loginRequest.getEmail())
             .orElseThrow(() -> new RuntimeException("User not found"));
